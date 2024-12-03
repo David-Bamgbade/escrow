@@ -10,4 +10,6 @@ import java.math.BigDecimal;
 public class ClientEscrowPaymentRequest {
     private String sellerPhoneNumber;
     private BigDecimal productPrice;
+    private String clientPhoneNumber;
+    private String setPaymentStatus;
 }

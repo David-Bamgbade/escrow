@@ -4,11 +4,12 @@ import com.escrow.dto.request.ClientEscrowPaymentRequest;
 import com.escrow.dto.request.AdminEscrowRequest;
 import com.escrow.dto.request.ClientSignUpRequest;
 import com.escrow.dto.request.SellerPaymentDetailsRequest;
+import com.escrow.dto.response.AdminEscrowResponse;
 import com.escrow.dto.response.EscrowPaymentResponse;
 import com.escrow.dto.response.SellerPaymentDetailsResponse;
 import com.escrow.model.BankName;
-import com.escrow.model.PaymentStatus;
 import com.escrow.repository.SellerDetailsRepo;
+import com.escrow.service.AdminService;
 import com.escrow.service.ClientService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,10 @@ class EscrowApplicationTests {
 
 	@Autowired
 	ClientService clientService;
+
+	@Autowired
+	AdminService adminService;
+
 
 	@Test
 	void testForClientToSendSellerDetailsToEscrow() {
@@ -46,6 +51,7 @@ class EscrowApplicationTests {
 		ClientEscrowPaymentRequest payment = new ClientEscrowPaymentRequest();
 		payment.setProductPrice(new BigDecimal("1000"));
 		payment.setSellerPhoneNumber("08169468242");
+		payment.setClientPhoneNumber("08109643956");
 		EscrowPaymentResponse paymentResponse = clientService.makePaymentToEscrow(payment);
 		assertTrue(paymentResponse.isSuccess());
 	}
@@ -53,8 +59,9 @@ class EscrowApplicationTests {
 	@Test
 	void testForAdminToConfirmPaymentToEscrow() {
 		AdminEscrowRequest adminRequest = new AdminEscrowRequest();
-		adminRequest.setClientPaymentStatus(PaymentStatus.PAID);
-		adminRequest.setMessageSeller("Payment Has Been Confirmed, please release goods");
+		adminRequest.setClientPhoneNumber("08109643956");
+		AdminEscrowResponse adminResponse = adminService.confirmClientPayment(adminRequest);
+		assertTrue(adminResponse.isPaymentStatus());
 	}
 
 	@Test

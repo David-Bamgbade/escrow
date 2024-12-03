@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 public class SellerDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long sellerIdId;
+    private Long sellerId;
     private String sellerName;
     private String sellerEmailAddress;
     private String sellerPhoneNumber;
@@ -23,4 +23,6 @@ public class SellerDetails {
     private Complain complainOrFeedBack;
     @Enumerated(EnumType.STRING)
     private BankName sellerBankName;
+    @Enumerated(EnumType.STRING)
+    private ClientPayment clientPayment;
 }
