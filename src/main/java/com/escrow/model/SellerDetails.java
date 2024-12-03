@@ -4,21 +4,23 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Setter
 @Getter
 @Entity
-public class Transaction {
+public class SellerDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long transactionId;
+    private Long sellerIdId;
     private String sellerName;
     private String sellerEmailAddress;
     private String sellerPhoneNumber;
-    private String productPrice;
+    private BigDecimal productPrice;
     private String productName;
     private String sellerAccountNumber;
-    @Enumerated(EnumType.STRING)
     @OneToOne(cascade = CascadeType.PERSIST)
-    private Complain complain;
-    private BankName bankName;
+    private Complain complainOrFeedBack;
+    @Enumerated(EnumType.STRING)
+    private BankName sellerBankName;
 }
