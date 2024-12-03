@@ -1,12 +1,9 @@
 package com.escrow.service;
 
-<<<<<<< HEAD
 import com.escrow.dto.request.ClientEscrowPaymentRequest;
-=======
 import com.escrow.dto.request.ClientComplainRequest;
 import com.escrow.dto.request.EscrowPaymentRequest;
 import com.escrow.dto.request.RegisterClientRequest;
->>>>>>> 02a2cb458e46fef74d5b13085c048570960b4048
 import com.escrow.dto.request.SellerPaymentDetailsRequest;
 import com.escrow.dto.response.ClientComplainResponse;
 import com.escrow.dto.response.EscrowPaymentResponse;
@@ -65,7 +62,6 @@ public class ClientServiceImpl implements ClientService {
         EscrowAccount escrowAccount = new EscrowAccount();
         Optional<SellerDetails> sellerDetails = sellerDetailsRepo.findSellerDetailsBySellerPhoneNumber(request.getSellerPhoneNumber());
 
-<<<<<<< HEAD
          if (sellerDetails.isPresent()) {
              escrowAccount.setProductPrice(sellerDetails.get().getProductPrice());
              escrowAccount.setProductName(sellerDetails.get().getProductName());
@@ -83,7 +79,7 @@ public class ClientServiceImpl implements ClientService {
             response.setSuccess(true);
             response.setMessage("Payment Successful");
             return response;
-=======
+       
         if (sellerDetails.isPresent()) {
             escrowAccount.setProductPrice(sellerDetails.get().getProductPrice());
             escrowAccount.setProductName(sellerDetails.get().getProductName());
@@ -151,7 +147,6 @@ public class ClientServiceImpl implements ClientService {
         Client client = clientRepo.findClientByEmail(request.getEmail());
         if (client == null)
             throw new RuntimeException("You are not allowed to make a complain request");
->>>>>>> 02a2cb458e46fef74d5b13085c048570960b4048
     }
 }
 
