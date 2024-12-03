@@ -1,10 +1,11 @@
 package com.escrow.service;
 
-import com.escrow.dto.request.EscrowPaymentRequest;
+import com.escrow.dto.request.ClientEscrowPaymentRequest;
 import com.escrow.dto.request.SellerPaymentDetailsRequest;
 import com.escrow.dto.response.EscrowPaymentResponse;
 import com.escrow.dto.response.SellerPaymentDetailsResponse;
 import com.escrow.model.EscrowAccount;
+import com.escrow.model.PaymentStatus;
 import com.escrow.model.SellerDetails;
 import com.escrow.repository.EscrowAccountRepo;
 import com.escrow.repository.SellerDetailsRepo;
@@ -40,7 +41,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public EscrowPaymentResponse makePaymentToEscrow(EscrowPaymentRequest request) {
+    public EscrowPaymentResponse makePaymentToEscrow(ClientEscrowPaymentRequest request) {
         EscrowAccount escrowAccount = new EscrowAccount();
          Optional<SellerDetails> sellerDetails = sellerDetailsRepo.findSellerDetailsBySellerPhoneNumber(request.getSellerPhoneNumber());
 
@@ -51,6 +52,7 @@ public class ClientServiceImpl implements ClientService {
              escrowAccount.setSellerBankName(sellerDetails.get().getSellerBankName());
              escrowAccount.setSellerPhoneNumber(sellerDetails.get().getSellerPhoneNumber());
              escrowAccount.setSellerName(sellerDetails.get().getSellerName());
+             escrowAccount.setPaymentStatus(PaymentStatus.PENDING);
              escrowAccountRepo.save(escrowAccount);
          }
             else {
