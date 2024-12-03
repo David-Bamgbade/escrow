@@ -7,4 +7,6 @@ import lombok.Setter;
 @Setter
 public class ClientComplainRequest {
     private String complainMessage;
+    private String email;
+
 }

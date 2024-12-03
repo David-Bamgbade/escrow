@@ -16,6 +16,7 @@ public class Complain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long complainId;
+    private String email;
     private String complainMessage;
     private LocalDateTime complainTime;
 }
