@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class ClientSignUpRequest {
-
+public class AdminComplainRequest {
+    private String clientEmail;
 }

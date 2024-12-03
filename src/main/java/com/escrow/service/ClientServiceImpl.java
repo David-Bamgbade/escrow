@@ -1,9 +1,11 @@
 package com.escrow.service;
 
 import com.escrow.dto.request.ClientEscrowPaymentRequest;
+
 import com.escrow.dto.request.ClientComplainRequest;
-import com.escrow.dto.request.EscrowPaymentRequest;
+
 import com.escrow.dto.request.RegisterClientRequest;
+
 import com.escrow.dto.request.SellerPaymentDetailsRequest;
 import com.escrow.dto.response.ClientComplainResponse;
 import com.escrow.dto.response.EscrowPaymentResponse;
@@ -12,7 +14,6 @@ import com.escrow.dto.response.SellerPaymentDetailsResponse;
 import com.escrow.model.Client;
 import com.escrow.model.Complain;
 import com.escrow.model.EscrowAccount;
-import com.escrow.model.PaymentStatus;
 import com.escrow.model.SellerDetails;
 import com.escrow.repository.ClientRepo;
 import com.escrow.repository.ComplainRepo;
@@ -30,27 +31,39 @@ import java.util.Optional;
 public class ClientServiceImpl implements ClientService {
 
    private final ModelMapper modelMapper;
+
     @Autowired
     SellerDetailsRepo sellerDetailsRepo;
+
     @Autowired
     EscrowAccountRepo escrowAccountRepo;
 
     private final ClientRepo clientRepo;
-    private final ComplainRepo complainRepo;
 
+    private final ComplainRepo complainRepo;
 
 
     @Override
     public SellerPaymentDetailsResponse sendSellerDetails(SellerPaymentDetailsRequest request) {
-        SellerDetails sellerDetails = new SellerDetails();
-        sellerDetails.setSellerName(request.getSellerName());
-        sellerDetails.setSellerEmailAddress(request.getSellerEmail());
-        sellerDetails.setSellerPhoneNumber(request.getSellerPhoneNumber());
-        sellerDetails.setSellerAccountNumber(request.getSellerAccountNumber());
-        sellerDetails.setSellerBankName(request.getSellerBankName());
-        sellerDetails.setProductName(request.getProductName());
-        sellerDetails.setProductPrice(request.getProductPrice());
-        sellerDetailsRepo.save(sellerDetails);
+        Optional<Client> mapClient = clientRepo.findClientByPhoneNumber(request.getClientPhoneNumber());
+
+        if (mapClient.isPresent()) {
+            SellerDetails sellerDetails = new SellerDetails();
+            sellerDetails.setSellerName(request.getSellerName());
+            sellerDetails.setSellerEmailAddress(request.getSellerEmail());
+            sellerDetails.setSellerPhoneNumber(request.getSellerPhoneNumber());
+            sellerDetails.setSellerAccountNumber(request.getSellerAccountNumber());
+            sellerDetails.setSellerBankName(request.getSellerBankName());
+            sellerDetails.setProductName(request.getProductName());
+            sellerDetails.setClientPhoneNumber(request.getClientPhoneNumber());
+            sellerDetails.setProductPrice(request.getProductPrice());
+            sellerDetails.setClientPaymentStatus("NOT YET PAID");
+            sellerDetails.setCreatedOn(LocalDateTime.now());
+            sellerDetailsRepo.save(sellerDetails);
+        }
+        else {
+            throw new IllegalArgumentException("Save Your Number To Use Service");
+        }
         SellerPaymentDetailsResponse response = new SellerPaymentDetailsResponse();
         response.setSuccess(true);
         response.setMessage("Seller Details Saved Successfully");
@@ -61,40 +74,27 @@ public class ClientServiceImpl implements ClientService {
     public EscrowPaymentResponse makePaymentToEscrow(ClientEscrowPaymentRequest request) {
         EscrowAccount escrowAccount = new EscrowAccount();
         Optional<SellerDetails> sellerDetails = sellerDetailsRepo.findSellerDetailsBySellerPhoneNumber(request.getSellerPhoneNumber());
+        Optional<Client> clientPhoneNumber = clientRepo.findClientByPhoneNumber(request.getClientPhoneNumber());
 
-         if (sellerDetails.isPresent()) {
+         if (sellerDetails.isPresent() && clientPhoneNumber.isPresent()) {
              escrowAccount.setProductPrice(sellerDetails.get().getProductPrice());
              escrowAccount.setProductName(sellerDetails.get().getProductName());
              escrowAccount.setSellerAccountNumber(sellerDetails.get().getSellerAccountNumber());
              escrowAccount.setSellerBankName(sellerDetails.get().getSellerBankName());
              escrowAccount.setSellerPhoneNumber(sellerDetails.get().getSellerPhoneNumber());
              escrowAccount.setSellerName(sellerDetails.get().getSellerName());
-             escrowAccount.setPaymentStatus(PaymentStatus.PENDING);
+             escrowAccount.setClientPhoneNumber(clientPhoneNumber.get().getPhoneNumber());
+             escrowAccount.setPaymentStatus("PENDING");
+             escrowAccount.setPaymentDate(LocalDateTime.now());
              escrowAccountRepo.save(escrowAccount);
          }
             else {
-                throw new RuntimeException("No such seller");
+                throw new IllegalArgumentException("No such seller or check your phone number");
          }
          EscrowPaymentResponse response = new EscrowPaymentResponse();
             response.setSuccess(true);
-            response.setMessage("Payment Successful");
+            response.setMessage("Payment Successful " + "We'll Notify " + sellerDetails.get().getSellerName() + " To Send The Product");
             return response;
-       
-        if (sellerDetails.isPresent()) {
-            escrowAccount.setProductPrice(sellerDetails.get().getProductPrice());
-            escrowAccount.setProductName(sellerDetails.get().getProductName());
-            escrowAccount.setSellerAccountNumber(sellerDetails.get().getSellerAccountNumber());
-            escrowAccount.setSellerBankName(sellerDetails.get().getSellerBankName());
-            escrowAccount.setSellerPhoneNumber(sellerDetails.get().getSellerPhoneNumber());
-            escrowAccount.setSellerName(sellerDetails.get().getSellerName());
-            escrowAccountRepo.save(escrowAccount);
-        } else {
-            throw new RuntimeException("No such seller");
-        }
-        EscrowPaymentResponse response = new EscrowPaymentResponse();
-        response.setSuccess(true);
-        response.setMessage("Payment Successful");
-        return response;
     }
 
     @Override
@@ -127,6 +127,9 @@ public class ClientServiceImpl implements ClientService {
             throw new RuntimeException("Email Already Exists");
         }
     }
+
+
+
     private void signUpValidate(RegisterClientRequest request) {
         if (request.getLastName().trim().isEmpty() ||
                 request.getPassword().trim().isEmpty() ||

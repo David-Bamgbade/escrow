@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -20,6 +21,7 @@ public class EscrowAccount {
     @Enumerated(EnumType.STRING)
     private BankName sellerBankName;
     private String sellerName;
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
+    private String paymentStatus;
+    private String clientPhoneNumber;
+    private LocalDateTime paymentDate;
 }

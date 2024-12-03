@@ -1,6 +1,5 @@
 package com.escrow.dto.request;
 
-import com.escrow.model.PaymentStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,5 +7,7 @@ import lombok.Setter;
 @Getter
 public class AdminEscrowRequest {
     private String messageSeller;
-    private PaymentStatus clientPaymentStatus;
+    private String clientPaymentStatus;
+    private String clientPhoneNumber;
+    private String sellerPhoneNumber;
 }
