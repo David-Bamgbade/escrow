@@ -1,13 +1,8 @@
 package com.escrow.model;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
-
-import java.util.List;
 
 @Setter
 @Getter
@@ -26,7 +21,9 @@ public class Client {
     @Enumerated(EnumType.STRING)
     private BankName bankName;
     @OneToOne(cascade = {CascadeType.PERSIST})
-    private Transaction transaction;
+    private SellerDetails sellerDetails;
     @OneToOne(cascade = {CascadeType.PERSIST})
     private Complain complain;
+    @OneToOne
+    private EscrowAccount escrowAccount;
 }

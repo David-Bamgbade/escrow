@@ -7,5 +7,4 @@ import lombok.Setter;
 @Setter
 public class ClientComplainRequest {
     private String complainMessage;
-
 }
