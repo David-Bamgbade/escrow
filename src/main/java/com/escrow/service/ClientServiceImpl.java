@@ -31,26 +31,39 @@ import java.util.Optional;
 public class ClientServiceImpl implements ClientService {
 
    private final ModelMapper modelMapper;
+
     @Autowired
     SellerDetailsRepo sellerDetailsRepo;
+
     @Autowired
     EscrowAccountRepo escrowAccountRepo;
 
     private final ClientRepo clientRepo;
+
     private final ComplainRepo complainRepo;
 
 
     @Override
     public SellerPaymentDetailsResponse sendSellerDetails(SellerPaymentDetailsRequest request) {
-        SellerDetails sellerDetails = new SellerDetails();
-        sellerDetails.setSellerName(request.getSellerName());
-        sellerDetails.setSellerEmailAddress(request.getSellerEmail());
-        sellerDetails.setSellerPhoneNumber(request.getSellerPhoneNumber());
-        sellerDetails.setSellerAccountNumber(request.getSellerAccountNumber());
-        sellerDetails.setSellerBankName(request.getSellerBankName());
-        sellerDetails.setProductName(request.getProductName());
-        sellerDetails.setProductPrice(request.getProductPrice());
-        sellerDetailsRepo.save(sellerDetails);
+        Optional<Client> mapClient = clientRepo.findClientByPhoneNumber(request.getClientPhoneNumber());
+
+        if (mapClient.isPresent()) {
+            SellerDetails sellerDetails = new SellerDetails();
+            sellerDetails.setSellerName(request.getSellerName());
+            sellerDetails.setSellerEmailAddress(request.getSellerEmail());
+            sellerDetails.setSellerPhoneNumber(request.getSellerPhoneNumber());
+            sellerDetails.setSellerAccountNumber(request.getSellerAccountNumber());
+            sellerDetails.setSellerBankName(request.getSellerBankName());
+            sellerDetails.setProductName(request.getProductName());
+            sellerDetails.setClientPhoneNumber(request.getClientPhoneNumber());
+            sellerDetails.setProductPrice(request.getProductPrice());
+            sellerDetails.setClientPaymentStatus("NOT YET PAID");
+            sellerDetails.setCreatedOn(LocalDateTime.now());
+            sellerDetailsRepo.save(sellerDetails);
+        }
+        else {
+            throw new IllegalArgumentException("Save Your Number To Use Service");
+        }
         SellerPaymentDetailsResponse response = new SellerPaymentDetailsResponse();
         response.setSuccess(true);
         response.setMessage("Seller Details Saved Successfully");
@@ -72,6 +85,7 @@ public class ClientServiceImpl implements ClientService {
              escrowAccount.setSellerName(sellerDetails.get().getSellerName());
              escrowAccount.setClientPhoneNumber(clientPhoneNumber.get().getPhoneNumber());
              escrowAccount.setPaymentStatus("PENDING");
+             escrowAccount.setPaymentDate(LocalDateTime.now());
              escrowAccountRepo.save(escrowAccount);
          }
             else {
@@ -79,7 +93,7 @@ public class ClientServiceImpl implements ClientService {
          }
          EscrowPaymentResponse response = new EscrowPaymentResponse();
             response.setSuccess(true);
-            response.setMessage("Payment Successful");
+            response.setMessage("Payment Successful " + "We'll Notify " + sellerDetails.get().getSellerName() + " To Send The Product");
             return response;
     }
 
@@ -113,6 +127,9 @@ public class ClientServiceImpl implements ClientService {
             throw new RuntimeException("Email Already Exists");
         }
     }
+
+
+
     private void signUpValidate(RegisterClientRequest request) {
         if (request.getLastName().trim().isEmpty() ||
                 request.getPassword().trim().isEmpty() ||

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -22,4 +23,5 @@ public class EscrowAccount {
     private String sellerName;
     private String paymentStatus;
     private String clientPhoneNumber;
+    private LocalDateTime paymentDate;
 }

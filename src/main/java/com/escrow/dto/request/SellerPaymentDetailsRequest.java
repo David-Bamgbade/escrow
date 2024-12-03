@@ -16,4 +16,5 @@ public class SellerPaymentDetailsRequest {
     private String sellerAccountNumber;
     private BankName sellerBankName;
     private String productName;
+    private String clientPhoneNumber;
 }

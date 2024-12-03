@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -23,6 +24,8 @@ public class SellerDetails {
     private Complain complainOrFeedBack;
     @Enumerated(EnumType.STRING)
     private BankName sellerBankName;
-    @Enumerated(EnumType.STRING)
-    private ClientPayment clientPayment;
+    private String clientPaymentStatus;
+    private String clientPhoneNumber;
+    private LocalDateTime createdOn;
+    private LocalDateTime clientPaymentDate;
 }
