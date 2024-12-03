@@ -20,4 +20,6 @@ public class EscrowAccount {
     @Enumerated(EnumType.STRING)
     private BankName sellerBankName;
     private String sellerName;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 }

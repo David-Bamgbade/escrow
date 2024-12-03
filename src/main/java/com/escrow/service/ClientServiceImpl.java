@@ -1,8 +1,12 @@
 package com.escrow.service;
 
+<<<<<<< HEAD
+import com.escrow.dto.request.ClientEscrowPaymentRequest;
+=======
 import com.escrow.dto.request.ClientComplainRequest;
 import com.escrow.dto.request.EscrowPaymentRequest;
 import com.escrow.dto.request.RegisterClientRequest;
+>>>>>>> 02a2cb458e46fef74d5b13085c048570960b4048
 import com.escrow.dto.request.SellerPaymentDetailsRequest;
 import com.escrow.dto.response.ClientComplainResponse;
 import com.escrow.dto.response.EscrowPaymentResponse;
@@ -11,6 +15,7 @@ import com.escrow.dto.response.SellerPaymentDetailsResponse;
 import com.escrow.model.Client;
 import com.escrow.model.Complain;
 import com.escrow.model.EscrowAccount;
+import com.escrow.model.PaymentStatus;
 import com.escrow.model.SellerDetails;
 import com.escrow.repository.ClientRepo;
 import com.escrow.repository.ComplainRepo;
@@ -56,10 +61,29 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public EscrowPaymentResponse makePaymentToEscrow(EscrowPaymentRequest request) {
+    public EscrowPaymentResponse makePaymentToEscrow(ClientEscrowPaymentRequest request) {
         EscrowAccount escrowAccount = new EscrowAccount();
         Optional<SellerDetails> sellerDetails = sellerDetailsRepo.findSellerDetailsBySellerPhoneNumber(request.getSellerPhoneNumber());
 
+<<<<<<< HEAD
+         if (sellerDetails.isPresent()) {
+             escrowAccount.setProductPrice(sellerDetails.get().getProductPrice());
+             escrowAccount.setProductName(sellerDetails.get().getProductName());
+             escrowAccount.setSellerAccountNumber(sellerDetails.get().getSellerAccountNumber());
+             escrowAccount.setSellerBankName(sellerDetails.get().getSellerBankName());
+             escrowAccount.setSellerPhoneNumber(sellerDetails.get().getSellerPhoneNumber());
+             escrowAccount.setSellerName(sellerDetails.get().getSellerName());
+             escrowAccount.setPaymentStatus(PaymentStatus.PENDING);
+             escrowAccountRepo.save(escrowAccount);
+         }
+            else {
+                throw new RuntimeException("No such seller");
+         }
+         EscrowPaymentResponse response = new EscrowPaymentResponse();
+            response.setSuccess(true);
+            response.setMessage("Payment Successful");
+            return response;
+=======
         if (sellerDetails.isPresent()) {
             escrowAccount.setProductPrice(sellerDetails.get().getProductPrice());
             escrowAccount.setProductName(sellerDetails.get().getProductName());
@@ -127,6 +151,7 @@ public class ClientServiceImpl implements ClientService {
         Client client = clientRepo.findClientByEmail(request.getEmail());
         if (client == null)
             throw new RuntimeException("You are not allowed to make a complain request");
+>>>>>>> 02a2cb458e46fef74d5b13085c048570960b4048
     }
 }
 
