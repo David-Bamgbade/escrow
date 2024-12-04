@@ -26,4 +26,5 @@ public class Client {
     private Complain complain;
     @OneToOne
     private EscrowAccount escrowAccount;
+    private boolean loggedIn;
 }

@@ -9,4 +9,7 @@ public interface ClientService {
     RegisterClientResponse signUp(RegisterClientRequest request);
     ClientComplainResponse makeComplain(ClientComplainRequest complainRequest);
     ClientAdminComplainResponse clientMakeComplain(ClientAdminComplainRequest request);
+    SameSellerDetailsResponse buyFromSameSeller(SameSellerDetailsRequest request);
+
+    LoginClientResponse loginClient(LoginClientRequest request);
 }

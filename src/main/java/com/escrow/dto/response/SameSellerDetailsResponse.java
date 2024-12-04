@@ -6,9 +6,9 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class EscrowPaymentResponse {
-    private boolean success;
-    private String message;
+public class SameSellerDetailsResponse {
     private BankName escrowBankName;
     private String escrowAccountNumber;
+    private boolean success;
+    private String message;
 }
