@@ -11,6 +11,8 @@ public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long adminId;
+    private String accountNumber;
+    private BankName bankName;
     private String userName;
     private String password;
 }

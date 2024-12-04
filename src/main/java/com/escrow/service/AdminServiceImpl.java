@@ -1,13 +1,14 @@
 package com.escrow.service;
 
 import com.escrow.dto.request.AdminEscrowRequest;
+import com.escrow.dto.request.ResolveComplainRequest;
+import com.escrow.dto.request.ViewClientComplainRequest;
 import com.escrow.dto.response.AdminEscrowResponse;
 import com.escrow.dto.response.EscrowPaymentResponse;
+import com.escrow.dto.response.ResolveComplainResponse;
+import com.escrow.dto.response.ViewClientComplainResponse;
 import com.escrow.model.*;
-import com.escrow.repository.AdminRepo;
-import com.escrow.repository.ClientRepo;
-import com.escrow.repository.EscrowAccountRepo;
-import com.escrow.repository.SellerDetailsRepo;
+import com.escrow.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,9 @@ public class AdminServiceImpl implements AdminService{
 
     @Autowired
     ClientRepo clientRepo;
+
+    @Autowired
+    ClientComplainRepo clientComplainRepo;
 
 
     @Override
@@ -51,4 +55,39 @@ public class AdminServiceImpl implements AdminService{
         adminResponse.setPaymentStatus(true);
         return adminResponse;
     }
+
+    public ViewClientComplainResponse viewClientComplain(ViewClientComplainRequest request) {
+        Optional <ClientComplain> clientComplain = clientComplainRepo.findClientComplainByClientPhoneNumber(request.getClientPhoneNumber());
+        if (clientComplain.isPresent()) {
+            ViewClientComplainResponse response = new ViewClientComplainResponse();
+            response.setClientComplainId(clientComplain.get().getClientComplainId());
+            response.setComplainTime(clientComplain.get().getComplainTime());
+            response.setComplainMessage(clientComplain.get().getComplainMessage());
+            response.setClientPhoneNumber(clientComplain.get().getClientPhoneNumber());
+            response.setPastTransactionTime(clientComplain.get().getPastTransactionTime());
+            response.setSellerName(clientComplain.get().getSellerName());
+            response.setProductName(clientComplain.get().getProductName());
+            response.setProductPrice(clientComplain.get().getProductPrice());
+            response.setSellerPhoneNumber(clientComplain.get().getSellerPhoneNumber());
+            response.setSuccess(true);
+            return response;
+        }
+        else {
+            throw new IllegalArgumentException("No Such Complain");
+        }
+    }
+
+    @Override
+    public ResolveComplainResponse resolveClientComplain(ResolveComplainRequest request) {
+        Optional <ClientComplain> clientComplain = clientComplainRepo.findClientComplainByClientPhoneNumber(request.getClientPhoneNumber());
+        if (clientComplain.isPresent()) {
+            clientComplain.get().setComplainResolved("Yes");
+            clientComplainRepo.save(clientComplain.get());
+        }
+        ResolveComplainResponse response = new ResolveComplainResponse();
+        response.setSuccess(true);
+        return response;
+    }
+
+
 }

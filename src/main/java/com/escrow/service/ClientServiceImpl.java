@@ -1,24 +1,10 @@
 package com.escrow.service;
 
-import com.escrow.dto.request.ClientEscrowPaymentRequest;
+import com.escrow.dto.request.*;
 
-import com.escrow.dto.request.ClientComplainRequest;
-
-import com.escrow.dto.request.RegisterClientRequest;
-
-import com.escrow.dto.request.SellerPaymentDetailsRequest;
-import com.escrow.dto.response.ClientComplainResponse;
-import com.escrow.dto.response.EscrowPaymentResponse;
-import com.escrow.dto.response.RegisterClientResponse;
-import com.escrow.dto.response.SellerPaymentDetailsResponse;
-import com.escrow.model.Client;
-import com.escrow.model.Complain;
-import com.escrow.model.EscrowAccount;
-import com.escrow.model.SellerDetails;
-import com.escrow.repository.ClientRepo;
-import com.escrow.repository.ComplainRepo;
-import com.escrow.repository.EscrowAccountRepo;
-import com.escrow.repository.SellerDetailsRepo;
+import com.escrow.dto.response.*;
+import com.escrow.model.*;
+import com.escrow.repository.*;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +28,7 @@ public class ClientServiceImpl implements ClientService {
 
     private final ComplainRepo complainRepo;
 
+    private final ClientComplainRepo clientComplainRepo;
 
     @Override
     public SellerPaymentDetailsResponse sendSellerDetails(SellerPaymentDetailsRequest request) {
@@ -84,6 +71,8 @@ public class ClientServiceImpl implements ClientService {
              escrowAccount.setSellerPhoneNumber(sellerDetails.get().getSellerPhoneNumber());
              escrowAccount.setSellerName(sellerDetails.get().getSellerName());
              escrowAccount.setClientPhoneNumber(clientPhoneNumber.get().getPhoneNumber());
+             escrowAccount.setEscrowBank(BankName.POLARIS_BANK);
+             escrowAccount.setEscrowAccountNumber("1130632430");
              escrowAccount.setPaymentStatus("PENDING");
              escrowAccount.setPaymentDate(LocalDateTime.now());
              escrowAccountRepo.save(escrowAccount);
@@ -120,6 +109,33 @@ public class ClientServiceImpl implements ClientService {
         response.setMessage("Complain Successfully");
         return response;
     }
+
+
+    public ClientAdminComplainResponse clientMakeComplain(ClientAdminComplainRequest request) {
+        Optional<EscrowAccount> clientTransaction = escrowAccountRepo.findBySellerPhoneNumber(request.getSellerPhoneNumber());
+        if (clientTransaction.isPresent()) {
+            ClientComplain complain = new ClientComplain();
+            complain.setSellerName(clientTransaction.get().getSellerName());
+            complain.setProductName(clientTransaction.get().getProductName());
+            complain.setProductPrice(clientTransaction.get().getProductPrice());
+            complain.setSellerPhoneNumber(clientTransaction.get().getSellerPhoneNumber());
+            complain.setComplainMessage(request.getComplainMessage());
+            complain.setPastTransactionTime(clientTransaction.get().getPaymentDate());
+            complain.setClientPhoneNumber(clientTransaction.get().getClientPhoneNumber());
+            complain.setTransactionPaymentStatus(clientTransaction.get().getPaymentStatus());
+            complain.setComplainTime(LocalDateTime.now());
+            complain.setComplainResolved("No");
+            clientComplainRepo.save(complain);
+        }
+        else {
+            throw new IllegalArgumentException("No Such Transaction");
+        }
+        ClientAdminComplainResponse response = new ClientAdminComplainResponse();
+        response.setMessage("Complain Sent");
+        response.setSuccess(true);
+        return response;
+    }
+
 
     public void validateClientEmail(RegisterClientRequest request) {
         Optional<Client> client = clientRepo.findByEmail(request.getEmail());

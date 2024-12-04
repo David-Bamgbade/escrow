@@ -24,4 +24,7 @@ public class EscrowAccount {
     private String paymentStatus;
     private String clientPhoneNumber;
     private LocalDateTime paymentDate;
+    @Enumerated(EnumType.STRING)
+    private BankName escrowBank;
+    private String escrowAccountNumber;
 }
