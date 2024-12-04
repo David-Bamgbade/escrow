@@ -1,5 +1,6 @@
 package com.escrow.service;
 
+import com.escrow.authentication.DetailValidation;
 import com.escrow.dto.request.*;
 
 import com.escrow.dto.response.*;
@@ -32,17 +33,18 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public SellerPaymentDetailsResponse sendSellerDetails(SellerPaymentDetailsRequest request) {
+        DetailValidation detailValidation = new DetailValidation();
         Optional<Client> mapClient = clientRepo.findClientByPhoneNumber(request.getClientPhoneNumber());
 
         if (mapClient.isPresent()) {
             SellerDetails sellerDetails = new SellerDetails();
-            sellerDetails.setSellerName(request.getSellerName());
-            sellerDetails.setSellerEmailAddress(request.getSellerEmail());
-            sellerDetails.setSellerPhoneNumber(request.getSellerPhoneNumber());
+            sellerDetails.setSellerName(detailValidation.validateFirstName(request.getSellerName()));
+            sellerDetails.setSellerEmailAddress(detailValidation.validateEmail(duplicateSellerEmail(request.getSellerEmail())));
+            sellerDetails.setSellerPhoneNumber(detailValidation.validatePhoneNumber(duplicateSellerPhoneNumber(request.getSellerPhoneNumber())));
             sellerDetails.setSellerAccountNumber(request.getSellerAccountNumber());
             sellerDetails.setSellerBankName(request.getSellerBankName());
             sellerDetails.setProductName(request.getProductName());
-            sellerDetails.setClientPhoneNumber(request.getClientPhoneNumber());
+            sellerDetails.setClientPhoneNumber(clientPhoneNumberExist(detailValidation.validatePhoneNumber(request.getClientPhoneNumber())));
             sellerDetails.setProductPrice(request.getProductPrice());
             sellerDetails.setClientPaymentStatus("NOT YET PAID");
             sellerDetails.setCreatedOn(LocalDateTime.now());
@@ -90,7 +92,7 @@ public class ClientServiceImpl implements ClientService {
     public RegisterClientResponse signUp(RegisterClientRequest request) {
          validateClientEmail(request);
          signUpValidate(request);
-         validateClientPhoneNumber(request.getPhoneNumber());
+         validateClientPhoneNumber(duplicateClientPhoneNumber(request.getPhoneNumber()));
          Client client = modelMapper.map(request, Client.class);
          clientRepo.save(client);
          RegisterClientResponse response = new RegisterClientResponse();
@@ -118,7 +120,7 @@ public class ClientServiceImpl implements ClientService {
             complain.setSellerName(clientTransaction.get().getSellerName());
             complain.setProductName(clientTransaction.get().getProductName());
             complain.setProductPrice(clientTransaction.get().getProductPrice());
-            complain.setSellerPhoneNumber(clientTransaction.get().getSellerPhoneNumber());
+            complain.setSellerPhoneNumber(duplicateSellerPhoneNumber(request.getSellerPhoneNumber()));
             complain.setComplainMessage(request.getComplainMessage());
             complain.setPastTransactionTime(clientTransaction.get().getPaymentDate());
             complain.setClientPhoneNumber(clientTransaction.get().getClientPhoneNumber());
@@ -136,22 +138,54 @@ public class ClientServiceImpl implements ClientService {
         return response;
     }
 
-
-    public void validateClientEmail(RegisterClientRequest request) {
+    private void validateClientEmail(RegisterClientRequest request) {
         Optional<Client> client = clientRepo.findByEmail(request.getEmail());
         if (client.isPresent()) {
             throw new RuntimeException("Email Already Exists");
         }
     }
 
+    private String duplicateClientPhoneNumber(String phoneNumber) {
+     Optional<Client> client = clientRepo.findClientByPhoneNumber(phoneNumber);
+     if (client.isPresent()) {
+         throw new RuntimeException("Phone Number Already Exists");
+     }
+     return phoneNumber;
+    }
+
+    private String duplicateSellerPhoneNumber(String phoneNumber) {
+        Optional<SellerDetails> seller = sellerDetailsRepo.findSellerDetailsBySellerPhoneNumber(phoneNumber);
+        if (seller.isPresent()) {
+            throw new RuntimeException("Phone Number Already Exists");
+        }
+        return phoneNumber;
+    }
+
+    private String duplicateSellerEmail(String email) {
+        Optional<SellerDetails> seller = sellerDetailsRepo.findSellerDetailsBySellerEmailAddress(email);
+        if (seller.isPresent()) {
+            throw new RuntimeException("Email Already Exists");
+        }
+        return email;
+    }
+
+    private String clientPhoneNumberExist(String phoneNumber) {
+        Optional<Client> client = clientRepo.findClientByPhoneNumber(phoneNumber);
+        if (client.isPresent()) {
+            return phoneNumber;
+        } else  {
+            throw new IllegalArgumentException("PhoneNumber Does Not Exist Register To Use Service");
+        }
+    }
 
 
     private void signUpValidate(RegisterClientRequest request) {
+        DetailValidation detailValidation = new DetailValidation();
         if (request.getLastName().trim().isEmpty() ||
                 request.getPassword().trim().isEmpty() ||
-                request.getEmail().trim().isEmpty() ||
+               detailValidation.validateEmail(request.getEmail()).trim().isEmpty() ||
                 request.getFirstName().trim().isEmpty() ||
-                request.getPhoneNumber().trim().isEmpty()){
+               detailValidation.validatePhoneNumber(request.getPhoneNumber()).trim().isEmpty()){
             throw new RuntimeException("Invalid detail entered");
         }
 

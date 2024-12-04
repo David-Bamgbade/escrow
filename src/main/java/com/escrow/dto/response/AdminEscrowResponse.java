@@ -7,6 +7,5 @@ import lombok.Setter;
 @Getter
 public class AdminEscrowResponse {
     private String notifySeller;
-    private String clientPaymentStatus;
     private boolean paymentStatus;
 }

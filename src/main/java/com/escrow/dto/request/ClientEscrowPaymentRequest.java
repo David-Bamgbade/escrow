@@ -9,7 +9,5 @@ import java.math.BigDecimal;
 @Getter
 public class ClientEscrowPaymentRequest {
     private String sellerPhoneNumber;
-    private BigDecimal productPrice;
     private String clientPhoneNumber;
-    private String setPaymentStatus;
 }
