@@ -30,11 +30,11 @@ public class ClientServiceTest {
     @Test
     public void testClientCanSignUp(){
         RegisterClientRequest request = new RegisterClientRequest();
-        request.setEmail("email@email.com");
+        request.setEmail("beez@email.com");
         request.setPassword("password");
         request.setFirstName("Abdul");
         request.setLastName("Azeez");
-        request.setPhoneNumber("08109643956");
+        request.setPhoneNumber("08104743956");
         RegisterClientResponse response = clientService.signUp(request);
         assertThat(response).isNotNull();
         assertThat(response.getMessage()).isNotNull();

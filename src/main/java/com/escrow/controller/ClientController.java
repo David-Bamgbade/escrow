@@ -3,7 +3,6 @@ package com.escrow.controller;
 import com.escrow.dto.request.*;
 import com.escrow.dto.response.*;
 import com.escrow.service.ClientService;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,11 +58,7 @@ public class ClientController {
         catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
         }
-
     }
-
-
-
 
 
     }
