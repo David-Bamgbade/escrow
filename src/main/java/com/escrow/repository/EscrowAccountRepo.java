@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface EscrowAccountRepo extends JpaRepository<EscrowAccount, Long> {
     Optional<EscrowAccount> findByClientPhoneNumber(String phoneNumber);
+    Optional<EscrowAccount> findBySellerPhoneNumber(String phoneNumber);
 }

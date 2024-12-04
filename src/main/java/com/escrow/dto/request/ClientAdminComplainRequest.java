@@ -3,9 +3,9 @@ package com.escrow.dto.request;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
 @Setter
-public class ClientComplainRequest {
-    private String email;
+@Getter
+public class ClientAdminComplainRequest {
+    private String sellerPhoneNumber;
     private String complainMessage;
 }

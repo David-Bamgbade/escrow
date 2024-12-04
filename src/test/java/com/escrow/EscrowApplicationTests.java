@@ -1,11 +1,9 @@
 package com.escrow;
 
 import com.escrow.dto.request.*;
-import com.escrow.dto.response.AdminComplainResponse;
-import com.escrow.dto.response.AdminEscrowResponse;
-import com.escrow.dto.response.EscrowPaymentResponse;
-import com.escrow.dto.response.SellerPaymentDetailsResponse;
+import com.escrow.dto.response.*;
 import com.escrow.model.BankName;
+import com.escrow.repository.ClientComplainRepo;
 import com.escrow.repository.SellerDetailsRepo;
 import com.escrow.service.AdminService;
 import com.escrow.service.ClientService;
@@ -29,6 +27,7 @@ class EscrowApplicationTests {
 
 	@Autowired
 	AdminService adminService;
+
 
 
 	@Test
@@ -65,10 +64,31 @@ class EscrowApplicationTests {
 
 	@Test
 	void testForClientToMakeComplain() {
-		AdminComplainRequest adminComplainRequest = new AdminComplainRequest();
-		adminComplainRequest.setClientEmail("email@email.com");
-		AdminComplainResponse adminComplainResponse = new AdminComplainResponse();
+		ClientAdminComplainRequest clientComplainRequest = new ClientAdminComplainRequest();
+		clientComplainRequest.setSellerPhoneNumber("08169468242");
+		clientComplainRequest.setComplainMessage("What I Ordered Versus What I Got");
+		ClientAdminComplainResponse clientComplainResponse = clientService.clientMakeComplain(clientComplainRequest);
+		assertTrue(clientComplainResponse.isSuccess());
 	}
+
+	@Test
+	void testForAdminToViewClientComplain() {
+		ViewClientComplainRequest request = new ViewClientComplainRequest();
+		request.setClientPhoneNumber("08109643956");
+		ViewClientComplainResponse response = adminService.viewClientComplain(request);
+		assertTrue(response.isSuccess());
+	}
+
+	@Test
+	void testForAdminToResolveComplain() {
+		ResolveComplainRequest resolveComplainRequest = new ResolveComplainRequest();
+		resolveComplainRequest.setClientPhoneNumber("08109643956");
+		ResolveComplainResponse complainResponse = adminService.resolveClientComplain(resolveComplainRequest);
+		assertTrue(complainResponse.isSuccess());
+	}
+
+
+
 
 
 
