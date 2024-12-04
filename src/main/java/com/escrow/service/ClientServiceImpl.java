@@ -25,6 +25,9 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     EscrowAccountRepo escrowAccountRepo;
 
+    @Autowired
+    ClientService clientService;
+
     private final ClientRepo clientRepo;
 
     private final ComplainRepo complainRepo;
@@ -62,6 +65,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public EscrowPaymentResponse makePaymentToEscrow(ClientEscrowPaymentRequest request) {
         EscrowAccount escrowAccount = new EscrowAccount();
+        EscrowPaymentResponse response = new EscrowPaymentResponse();
         Optional<SellerDetails> sellerDetails = sellerDetailsRepo.findSellerDetailsBySellerPhoneNumber(request.getSellerPhoneNumber());
         Optional<Client> clientPhoneNumber = clientRepo.findClientByPhoneNumber(request.getClientPhoneNumber());
 
@@ -78,13 +82,14 @@ public class ClientServiceImpl implements ClientService {
              escrowAccount.setPaymentStatus("PENDING");
              escrowAccount.setPaymentDate(LocalDateTime.now());
              escrowAccountRepo.save(escrowAccount);
+             response.setSuccess(true);
+             response.setMessage("Please Make Payment To Escrow, So We Can " + "Notify " + sellerDetails.get().getSellerName() + " To Send The Product");
+             response.setEscrowBankName(escrowAccount.getSellerBankName());
+             response.setEscrowAccountNumber(escrowAccount.getSellerAccountNumber());
          }
             else {
                 throw new IllegalArgumentException("No such seller or check your phone number");
          }
-         EscrowPaymentResponse response = new EscrowPaymentResponse();
-            response.setSuccess(true);
-            response.setMessage("Payment Successful " + "We'll Notify " + sellerDetails.get().getSellerName() + " To Send The Product");
             return response;
     }
 
@@ -99,6 +104,8 @@ public class ClientServiceImpl implements ClientService {
          response.setMessage("Client Successfully signed up");
          return response;
     }
+
+
 
     @Override
     public ClientComplainResponse makeComplain(ClientComplainRequest complainRequest) {
@@ -115,6 +122,7 @@ public class ClientServiceImpl implements ClientService {
 
     public ClientAdminComplainResponse clientMakeComplain(ClientAdminComplainRequest request) {
         Optional<EscrowAccount> clientTransaction = escrowAccountRepo.findBySellerPhoneNumber(request.getSellerPhoneNumber());
+
         if (clientTransaction.isPresent()) {
             ClientComplain complain = new ClientComplain();
             complain.setSellerName(clientTransaction.get().getSellerName());
@@ -138,8 +146,52 @@ public class ClientServiceImpl implements ClientService {
         return response;
     }
 
+    @Override
+    public SameSellerDetailsResponse buyFromSameSeller(SameSellerDetailsRequest request) {
+      Optional<SellerDetails> sellerDetails = sellerDetailsRepo.findSellerDetailsBySellerPhoneNumber(request.getSellerPhoneNumber());
+        SameSellerDetailsResponse response = new SameSellerDetailsResponse();
+
+      if (sellerDetails.isPresent()) {
+          EscrowAccount escrowAccount = new EscrowAccount();
+          escrowAccount.setSellerName(sellerDetails.get().getSellerName());
+          escrowAccount.setProductName(request.getProductName());
+          escrowAccount.setProductPrice(request.getProductPrice());
+          escrowAccount.setSellerAccountNumber(sellerDetails.get().getSellerAccountNumber());
+          escrowAccount.setSellerBankName(sellerDetails.get().getSellerBankName());
+          escrowAccount.setSellerPhoneNumber(sellerDetails.get().getSellerPhoneNumber());
+          escrowAccount.setPaymentStatus("PENDING");
+          escrowAccount.setPaymentDate(LocalDateTime.now());
+          escrowAccount.setEscrowAccountNumber("1130632430");
+          escrowAccount.setEscrowBank(BankName.POLARIS_BANK);
+          escrowAccount.setClientPhoneNumber(clientPhoneNumberExist(request.getClientPhoneNumber()));
+          escrowAccountRepo.save(escrowAccount);
+          response.setEscrowBankName(escrowAccount.getEscrowBank());
+          response.setEscrowAccountNumber(escrowAccount.getEscrowAccountNumber());
+          response.setMessage("Make Payment To Our Escrow Account");
+          response.setSuccess(true);
+      }
+        return response;
+    }
+
+    @Override
+    public LoginClientResponse loginClient(LoginClientRequest request) {
+        DetailValidation validation = new DetailValidation();
+        LoginClientResponse response = new LoginClientResponse();
+        Optional<Client> client = clientRepo.findClientByEmailAndPassword(validation.validateEmail(request.getClientEmail()), request.getPassword());
+        if (client.isPresent()) {
+            client.get().setLoggedIn(true);
+            clientRepo.save(client.get());
+        }
+        else  {
+            throw new RuntimeException("Register Before You Login");
+        }
+        response.setSuccess(true);
+        return response;
+    }
+
+
     private void validateClientEmail(RegisterClientRequest request) {
-        Optional<Client> client = clientRepo.findByEmail(request.getEmail());
+        Optional<Client> client = clientRepo.findClientByEmail(request.getEmail());
         if (client.isPresent()) {
             throw new RuntimeException("Email Already Exists");
         }
@@ -197,10 +249,16 @@ public class ClientServiceImpl implements ClientService {
     }
 
     private void verifyClient(ClientComplainRequest request) {
-        Client client = clientRepo.findClientByEmail(request.getEmail());
-        if (client == null)
+        Optional <Client> client = clientRepo.findClientByEmail(request.getEmail());
+        if (client.isEmpty())
             throw new RuntimeException("You are not allowed to make a complain request");
     }
+
+
+
+
+
+
 }
 
 

@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -87,7 +86,25 @@ class EscrowApplicationTests {
 		assertTrue(complainResponse.isSuccess());
 	}
 
+	@Test
+	void testForClientToBuyFromSameSellerThroughEscrow() {
+		SameSellerDetailsRequest sameSeller = new SameSellerDetailsRequest();
+		sameSeller.setSellerPhoneNumber("08169468242");
+		sameSeller.setClientPhoneNumber("08109643956");
+		sameSeller.setProductPrice(new BigDecimal("1000"));
+		sameSeller.setProductName("Addidas Shoes");
+		SameSellerDetailsResponse response = clientService.buyFromSameSeller(sameSeller);
+		assertTrue(response.isSuccess());
+	}
 
+	@Test
+	void testForClientToLogin() {
+		LoginClientRequest loginRequest = new LoginClientRequest();
+		loginRequest.setClientEmail("beez@email.com");
+		loginRequest.setPassword("password");
+		LoginClientResponse response = clientService.loginClient(loginRequest);
+		assertTrue(response.isSuccess());
+	}
 
 
 

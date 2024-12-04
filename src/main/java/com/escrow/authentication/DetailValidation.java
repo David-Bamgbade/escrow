@@ -37,7 +37,6 @@ public class DetailValidation {
         if (regex) {
             return password;
         }
-
         else {
             throw new IllegalArgumentException("Invalid password try again");
         }
