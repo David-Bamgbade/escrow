@@ -118,7 +118,7 @@ public class ClientServiceImpl implements ClientService {
             complain.setSellerName(clientTransaction.get().getSellerName());
             complain.setProductName(clientTransaction.get().getProductName());
             complain.setProductPrice(clientTransaction.get().getProductPrice());
-            complain.setSellerPhoneNumber(clientTransaction.get().getSellerPhoneNumber());
+            complain.setSellerPhoneNumber(request.getSellerPhoneNumber());
             complain.setComplainMessage(request.getComplainMessage());
             complain.setPastTransactionTime(clientTransaction.get().getPaymentDate());
             complain.setClientPhoneNumber(clientTransaction.get().getClientPhoneNumber());

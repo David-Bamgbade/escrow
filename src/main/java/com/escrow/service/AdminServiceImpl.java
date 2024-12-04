@@ -69,6 +69,7 @@ public class AdminServiceImpl implements AdminService{
             response.setProductName(clientComplain.get().getProductName());
             response.setProductPrice(clientComplain.get().getProductPrice());
             response.setSellerPhoneNumber(clientComplain.get().getSellerPhoneNumber());
+            response.setTransactionPaymentStatus(clientComplain.get().getTransactionPaymentStatus());
             response.setSuccess(true);
             return response;
         }
