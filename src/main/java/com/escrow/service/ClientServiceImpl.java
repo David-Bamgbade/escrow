@@ -1,6 +1,6 @@
 package com.escrow.service;
 
-import com.escrow.authentication.DetailValidation;
+import com.escrow.security.DetailValidation;
 import com.escrow.dto.request.*;
 
 import com.escrow.dto.response.*;
@@ -9,6 +9,7 @@ import com.escrow.repository.*;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,8 @@ public class ClientServiceImpl implements ClientService {
     private final ComplainRepo complainRepo;
 
     private final ClientComplainRepo clientComplainRepo;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public SellerPaymentDetailsResponse sendSellerDetails(SellerPaymentDetailsRequest request) {
@@ -227,9 +230,10 @@ public class ClientServiceImpl implements ClientService {
 
 
     private void signUpValidate(RegisterClientRequest request) {
+
         DetailValidation detailValidation = new DetailValidation();
         if (request.getLastName().trim().isEmpty() ||
-                request.getPassword().trim().isEmpty() ||
+                passwordEncoder.encode(request.getPassword()).trim().isEmpty() ||
                detailValidation.validateEmail(request.getEmail()).trim().isEmpty() ||
                 request.getFirstName().trim().isEmpty() ||
                detailValidation.validatePhoneNumber(request.getPhoneNumber()).trim().isEmpty()){
