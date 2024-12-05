@@ -1,4 +1,4 @@
-package com.escrow.authentication;
+package com.escrow.security;
 
 public class DetailValidation {
 
