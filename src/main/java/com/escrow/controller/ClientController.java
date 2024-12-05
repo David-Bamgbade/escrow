@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/client")
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 public class ClientController {
 
     @Autowired
     private ClientService clientService;
 
-    @PostMapping("/signUp")
+    @PostMapping("signUp")
     public ResponseEntity<RegisterClientResponse> registerClient(@RequestBody RegisterClientRequest request) {
         try {
           RegisterClientResponse register = clientService.signUp(request);
@@ -24,10 +25,9 @@ public class ClientController {
         catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
         }
-
     }
 
-    @PostMapping("/sendSellerDetails")
+    @PostMapping("sendSellerDetails")
     public ResponseEntity<SellerPaymentDetailsResponse> sendSellerDetails(@RequestBody SellerPaymentDetailsRequest request) {
         try {
             SellerPaymentDetailsResponse sendDetails = clientService.sendSellerDetails(request);
@@ -38,7 +38,7 @@ public class ClientController {
         }
     }
 
-    @PostMapping("/sendPaymentToEscrow")
+    @PostMapping("sendPaymentToEscrow")
     public ResponseEntity<EscrowPaymentResponse> sendPaymentToEscrow(@RequestBody ClientEscrowPaymentRequest request) {
         try {
             EscrowPaymentResponse response = clientService.makePaymentToEscrow(request);
@@ -49,7 +49,7 @@ public class ClientController {
         }
     }
 
-    @PostMapping("/makeComplain")
+    @PostMapping("makeComplain")
     public ResponseEntity<ClientAdminComplainResponse> clientComplain(@RequestBody ClientAdminComplainRequest request) {
         try {
             ClientAdminComplainResponse response = clientService.clientMakeComplain(request);
