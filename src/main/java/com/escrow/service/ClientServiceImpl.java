@@ -25,9 +25,6 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     EscrowAccountRepo escrowAccountRepo;
 
-    @Autowired
-    ClientService clientService;
-
     private final ClientRepo clientRepo;
 
     private final ComplainRepo complainRepo;
@@ -104,8 +101,6 @@ public class ClientServiceImpl implements ClientService {
          response.setMessage("Client Successfully signed up");
          return response;
     }
-
-
 
     @Override
     public ClientComplainResponse makeComplain(ClientComplainRequest complainRequest) {
