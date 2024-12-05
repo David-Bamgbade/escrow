@@ -8,15 +8,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/client")
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:8080")
+@RequestMapping("/client")
 public class ClientController {
 
     @Autowired
     private ClientService clientService;
 
-    @PostMapping("signUp")
+
+    @PostMapping("/signUp")
     public ResponseEntity<RegisterClientResponse> registerClient(@RequestBody RegisterClientRequest request) {
         try {
           RegisterClientResponse register = clientService.signUp(request);
@@ -27,7 +28,7 @@ public class ClientController {
         }
     }
 
-    @PostMapping("sendSellerDetails")
+    @PostMapping("/sendSellerDetails")
     public ResponseEntity<SellerPaymentDetailsResponse> sendSellerDetails(@RequestBody SellerPaymentDetailsRequest request) {
         try {
             SellerPaymentDetailsResponse sendDetails = clientService.sendSellerDetails(request);
